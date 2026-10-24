@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Cloudflare Pages build: publish only the browser-facing files.
+# Static build: publish only the browser-facing files.
 rm -rf dist
 mkdir -p dist
 cp index.html dist/

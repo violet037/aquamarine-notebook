@@ -35,14 +35,23 @@ python -m http.server 8765
 - 约 13–14 MB，首次解析会比文件夹版慢两三秒，之后滚动和筛选都正常。
 - 它**不包含在** `Aquamarine-site.zip` 里，单独发送这一个文件即可。
 
-## 自动更新（GitHub Actions + Cloudflare Pages）
+## 线上地址
 
-仓库里带了自动同步脚本和 GitHub Actions workflow：
+已经部署到 GitHub Pages：
 
-- `.github/workflows/update.yml`
-- `scripts/update_bangumi.py`
-- `scripts/build_standalone.py`
-- `build.sh`（Cloudflare Pages 构建用）
+<https://violet037.github.io/aquamarine-notebook/>
+
+仓库：<https://github.com/violet037/aquamarine-notebook>
+
+## 自动更新（GitHub Actions + GitHub Pages）
+
+仓库里带了自动同步和自动部署：
+
+- `.github/workflows/update.yml`：每周同步 Bangumi 数据
+- `.github/workflows/deploy.yml`：每次 `main` 有新提交就构建并部署 GitHub Pages
+- `scripts/update_bangumi.py`：拉取收藏、更新统计、下载新封面
+- `scripts/build_standalone.py`：重新生成手机单文件版
+- `build.sh`：静态构建，把页面输出到 `dist/`
 
 **运行频率**：每周日 05:00（北京时间）。GitHub Actions 使用 UTC，所以 cron 写的是 `0 21 * * 6`。也可以在 Actions 页面点 **Run workflow** 手动运行。
 
@@ -51,7 +60,7 @@ python -m http.server 8765
 - Bangumi 收藏数量、状态、评分、短评、集数；
 - 完成率、平均分、评分分布、年份分布；
 - 新增作品的封面（自动下载并转成 WebP）；
-- `js/data.js` 和 `assets/covers/` 会由 bot 提交，Cloudflare Pages 随后自动重新部署。
+- `js/data.js` 和 `assets/covers/` 由 bot 提交后，`deploy.yml` 自动重新构建并发布。
 
 **不会自动更新**：
 
@@ -59,29 +68,19 @@ python -m http.server 8765
 - 「私藏 / 时间线 / 手帖注」等编辑文字：脚本会保留；
 - 标签云和口味浓度条：属于当前口味快照，不会每周重算。
 
-### 第一次配置
+### 当前配置
 
-1. 在 GitHub 建一个空仓库，例如 `aquamarine-notebook`，**不要**勾选 README / .gitignore / license。
-2. 这个目录已经初始化 Git 并完成首次提交；你只需要添加 remote 并 push。也可以直接用 GitHub Desktop 的「Add existing repository」发布为私有仓库。在本目录执行：
+- 仓库：`violet037/aquamarine-notebook`，Public
+- Pages Source：**GitHub Actions**
+- 线上地址：`https://violet037.github.io/aquamarine-notebook/`
+- 自动更新：每周日 05:00，或手动 `Run workflow`
+- 自动部署：任何推送到 `main` 的提交都会触发 `Deploy site`
 
-```powershell
-git remote add origin https://github.com/<你的用户名>/aquamarine-notebook.git
-git branch -M main
-git push -u origin main
-```
+手动运行 update workflow 时，还会额外生成最新的 `Aquamarine-standalone.html`，放在 Actions 的 **Artifacts** 里，可下载。
 
-3. 打开 [Cloudflare Pages](https://pages.cloudflare.com/)，选择 **Connect to Git**，连接这个仓库。
-4. 构建设置：
-   - Framework preset：`None`
-   - Build command：`bash build.sh`
-   - Build output directory：`dist`
-5. 部署完成后会得到 `https://<项目名>.pages.dev`。之后每周 bot 推送新数据，Pages 会自动重新构建。
-
-手动运行 workflow 时，还会额外生成一个最新的 `Aquamarine-standalone.html`，放在 Actions 的 **Artifacts** 里，可下载。
-
-> 仓库建议设为 Private；Cloudflare Pages 连接私有仓库时，需要在 GitHub App 授权里勾选这个仓库。
+> 当前仓库是 Public；改成 Private 后，免费账号的 GitHub Pages 可能不可用，需要 GitHub Pro 或改用其他托管。
 >
-> 单文件版体积约 13 MB，不建议每次提交到 Git 历史里，所以 `.gitignore` 已排除它；需要时从 Actions artifact 下载，或本地运行 `python scripts/build_standalone.py`。
+> 单文件版约 13 MB，不建议提交进 Git 历史，所以 `.gitignore` 已排除它；需要时从 Actions artifact 下载，或本地运行 `python scripts/build_standalone.py`。
 
 ## 页面内容
 
@@ -110,10 +109,11 @@ assets/noise.svg              纸张颗粒纹理
 preview.jpg                   桌面版预览图
 preview-mobile.jpg            手机版预览图
 .github/workflows/update.yml  每周自动同步 Bangumi 的 workflow
+.github/workflows/deploy.yml  推送后自动构建并发布 GitHub Pages
 scripts/update_bangumi.py     拉取收藏、更新统计、下载新封面的脚本
 scripts/build_standalone.py   重新生成手机单文件版
-build.sh                      Cloudflare Pages 构建脚本
-_headers                      Cloudflare Pages 缓存与安全响应头
+build.sh                      静态构建脚本
+_headers                      可选：Cloudflare 缓存与安全响应头
 requirements.txt              GitHub Actions 需要的 Python 依赖
 ```
 
