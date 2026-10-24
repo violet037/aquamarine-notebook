@@ -62,7 +62,7 @@ python -m http.server 8765
 ### 第一次配置
 
 1. 在 GitHub 建一个空仓库，例如 `aquamarine-notebook`，**不要**勾选 README / .gitignore / license。
-2. 在本目录执行：
+2. 这个目录已经初始化 Git 并完成首次提交；你只需要添加 remote 并 push。也可以直接用 GitHub Desktop 的「Add existing repository」发布为私有仓库。在本目录执行：
 
 ```powershell
 git remote add origin https://github.com/<你的用户名>/aquamarine-notebook.git
@@ -122,7 +122,7 @@ requirements.txt              GitHub Actions 需要的 Python 依赖
 - Bangumi 用户页：<https://bangumi.tv/user/1242442>
   - 使用 Bangumi 公开 API 读取 221 部动画收藏、评分、状态、封面与标签；封面取自 Bangumi 高清原图，转为 640px WebP（单文件版为 560px）。
   - 全站总览 246 收藏 / 185 完成 / 75.2% / 8.03 来自公开个人页；动画维度为 221 / 170 / 76.9% / 8.02。
-  - 数据快照：2026-10-23。
+  - 数据快照：2026-10-24；之后由 GitHub Actions 每周自动同步。
 - 天使动漫个人资料：<https://www.tsdm39.com/home.php?mod=space&uid=2234737>
   - 使用公开资料中的 UID、用户组、头衔、签名、生日、地区、威望、天使币、天然 / 腹黑等。
   - 数据快照：2026-10-23。
