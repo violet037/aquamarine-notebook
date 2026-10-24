@@ -1,0 +1,58 @@
+name: Sync Bangumi collection
+
+on:
+  schedule:
+    # GitHub Actions uses UTC. 21:00 Saturday UTC = 05:00 Sunday in Beijing.
+    - cron: "0 21 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bangumi-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sync Bangumi collection
+        run: python scripts/update_bangumi.py
+
+      - name: Commit updated data and covers
+        run: |
+          git config user.name "Aquamarine Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/data.js assets/covers
+          if git diff --cached --quiet; then
+            echo "No collection changes."
+          else
+            git commit -m "chore: sync Bangumi collection"
+            git push
+          fi
+
+      - name: Build standalone HTML (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        run: python scripts/build_standalone.py
+
+      - name: Upload standalone HTML artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aquamarine-standalone
+          path: Aquamarine-standalone.html
+          retention-days: 30

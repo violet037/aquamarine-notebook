@@ -1,0 +1,17 @@
+# Cloudflare / local build output
+dist/
+
+# Local-only distributables
+Aquamarine-site.zip
+Aquamarine-standalone.html
+
+# Local test files
+js/data.before-update.js
+__pycache__/
+*.py[cod]
+*.log
+
+# Unrelated workspace files
+admin-*
+clean-*
+elev-*
